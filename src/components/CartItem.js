@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import productImage from "../resources/avocadohass.jpg";
+import productImage from "../assets/images/avocadohass.jpg";
 import { useState } from "react";
 
 const TableRow = styled.tr`
@@ -140,7 +140,7 @@ const CartItem = ({ product }) => {
         <Button>Edit</Button>
       </TableCell>
       {isModalVisible && (
-        <ModalOverlay>
+        <ModalOverlay onClick={handleClose}>
           <ModalContainer>
             <ModalTitleBar>
               <h5>Missing product</h5>
