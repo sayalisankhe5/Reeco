@@ -1,12 +1,21 @@
 import styled from "styled-components";
 import productImage from "../assets/images/avocadohass.jpg";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { changeStatus } from "../redux/slice/cartSlice";
 
 const TableRow = styled.tr`
   border-bottom: 1px solid #ddd;
   overflow-x: auto;
 `;
 const TableCell = styled.td`
+  padding: 10px;
+  text-align: center;
+  word-wrap: break-word;
+`;
+
+const StatusTableCell = styled.td`
+  background-color: #eaeaea;
   padding: 10px;
   text-align: center;
 `;
@@ -18,17 +27,17 @@ const Image = styled.img`
 
 const StatusButton = styled.button`
   background-color: ${(props) =>
-    props.orderStatus === "Approved"
+    props.orderstatus === "Approved"
       ? "#3fd833"
-      : props.orderStatus === "Missing"
+      : props.orderstatus === "Missing"
       ? "#f66d44"
       : "#db2114"};
   color: white;
   border: 1px solid
     ${(props) =>
-      props.orderStatus === "Approved"
+      props.orderstatus === "Approved"
         ? "#3fd833"
-        : props.orderStatus === "Missing"
+        : props.orderstatus === ("Missing" || "Missing - Urgent")
         ? "#f66d44"
         : "#db2114"};
   padding: 10px 20px;
@@ -48,8 +57,24 @@ const ModalOverlay = styled.div`
   align-items: center;
   z-index: 1000;
 `;
-const Button = styled.button`
-  color: green;
+const ApprovedButton = styled.span`
+  color: ${(props) => (props.orderstatus === "Approved" ? "#3fd833" : "gray")};
+  border: none;
+  cursor: pointer;
+  background: transparent;
+`;
+const MissingButton = styled.span`
+  color: ${(props) =>
+    (props.orderstatus === "Missing") |
+    (props.orderstatus === "Missing - Urgent")
+      ? "#ff0000"
+      : "gray"};
+  border: none;
+  cursor: pointer;
+  background: transparent;
+`;
+const EditButton = styled.span`
+  color: gray;
   border: none;
   cursor: pointer;
   background: transparent;
@@ -92,20 +117,20 @@ const ActionButton = styled.button`
 
 const CartItem = ({ product }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [orderStatus, setOrderStatus] = useState("");
-
+  const dispatch = useDispatch();
+  const cartItems = useSelector((_state) => _state.cart.cartItems);
+  const currentCartItem = cartItems.find((c) => c.id == product.id);
   const handleRemoveClick = () => {
     setIsModalVisible(true);
   };
 
   const handleConfirm = () => {
-    setOrderStatus("Missing – Urgent");
+    dispatch(changeStatus({ ...product, status: "Missing - Urgent" }));
     setIsModalVisible(false);
   };
 
   const handleCancel = () => {
-    setOrderStatus("Missing");
-
+    dispatch(changeStatus({ ...product, status: "Missing" }));
     setIsModalVisible(false);
   };
   const handleClose = () => {
@@ -113,7 +138,7 @@ const CartItem = ({ product }) => {
   };
 
   const handleApproveClick = () => {
-    setOrderStatus("Approved");
+    dispatch(changeStatus({ ...product, status: "Approved" }));
   };
   return (
     <TableRow>
@@ -122,23 +147,29 @@ const CartItem = ({ product }) => {
       </TableCell>
       <TableCell>{product.productName}</TableCell>
       <TableCell>{product.brand}</TableCell>
-      <TableCell>${product.price}</TableCell>
-      <TableCell>{product.quantity}</TableCell>
-      <TableCell>${product.total}</TableCell>
-      <TableCell>
-        {orderStatus !== "" && (
-          <StatusButton orderStatus={orderStatus}>{orderStatus}</StatusButton>
+      <TableCell>${product.price} / 6+1LB</TableCell>
+      <TableCell>{product.quantity} X 6+1LB</TableCell>
+      <TableCell>${product.price * product.quantity}</TableCell>
+      <StatusTableCell>
+        {currentCartItem.status !== "" && (
+          <StatusButton orderstatus={currentCartItem.status}>
+            {currentCartItem.status}
+          </StatusButton>
         )}
-      </TableCell>
-      <TableCell onClick={handleApproveClick}>
-        <span>&#10003;</span>
-      </TableCell>
-      <TableCell onClick={handleRemoveClick}>
-        <span>&#10060;</span>
-      </TableCell>
-      <TableCell>
-        <Button>Edit</Button>
-      </TableCell>
+      </StatusTableCell>
+      <StatusTableCell onClick={handleApproveClick}>
+        <ApprovedButton orderstatus={currentCartItem.status}>
+          &#10004;
+        </ApprovedButton>
+      </StatusTableCell>
+      <StatusTableCell onClick={handleRemoveClick}>
+        <MissingButton orderstatus={currentCartItem.status}>
+          &#10006;
+        </MissingButton>
+      </StatusTableCell>
+      <StatusTableCell>
+        <EditButton>Edit</EditButton>
+      </StatusTableCell>
       {isModalVisible && (
         <ModalOverlay onClick={handleClose}>
           <ModalContainer>

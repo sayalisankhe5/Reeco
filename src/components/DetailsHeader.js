@@ -44,27 +44,6 @@ const DetailsHeader = () => {
           </ContentItem>
         );
       })}
-
-      {/* <ContentItem>
-        <Heading>Item 2</Heading>
-        <Data>Value 2</Data>
-      </ContentItem> */}
-      {/* <ContentItem>
-        <Heading>Item 3</Heading>
-        <Data>Value 3</Data>
-      </ContentItem>
-      <ContentItem>
-        <Heading>Item 4</Heading>
-        <Data>Value 4</Data>
-      </ContentItem>
-      <ContentItem>
-        <Heading>Item 5</Heading>
-        <Data>Value 5</Data>
-      </ContentItem>
-      <ContentItem>
-        <Heading>Item 6</Heading>
-        <Data>Value 6</Data>
-      </ContentItem> */}
     </Container>
   );
 };
